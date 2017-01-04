@@ -1,6 +1,6 @@
 <export>
 </export>
-<library   name="CMSDAS2012GenExercise_plugins" file="*.cc">
+<library   name="CMSDASGenExercise_plugins" file="*.cc">
   <use   name="FWCore/Framework"/>
   <use   name="FWCore/ParameterSet"/>
   <use   name="FWCore/MessageLogger"/>

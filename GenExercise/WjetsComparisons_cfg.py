@@ -42,7 +42,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 process.source = cms.Source("PoolSource")
 process.source.fileNames = cms.untracked.vstring(options.inputFiles)
 
-#process.load("CMSDAS2012.GenExercise.WjetsPy6_cff")
+#process.load("CMSDASGEN.GenExercise.WjetsPy6_cff")
 
 # from Configuration.Generator.PythiaUESettings_cfi import *
 

@@ -62,7 +62,7 @@ for l in options.inputFiles:
 
 print options.product
 
-#process.load("CMSDAS2012.GenExercise.WjetsPy6_cff")
+#process.load("CMSDASGEN.GenExercise.WjetsPy6_cff")
 
 # from Configuration.Generator.PythiaUESettings_cfi import *
 
