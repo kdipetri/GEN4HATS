@@ -12,8 +12,8 @@ rm *.ps
 
 echo "
 .L MECompare.C+ 
-MECompare(\"$hist1\",\"$hist2\",\"plotGenWBoson\"); 
-MECompare(\"$hist1\",\"$hist2\",\"plotTransverseW\"); 
+MECompare(\"$hist1\",\"$hist2\",\"plotGenZBoson\"); 
+MECompare(\"$hist1\",\"$hist2\",\"plotTransverseZ\"); 
 MECompare(\"$hist1\",\"$hist2\",\"plotGenLeptons\");
 MECompare(\"$hist1\",\"$hist2\",\"plotGenJets\");
 MECompare(\"$hist1\",\"$hist2\",\"plotLeptonPlusJet\");
