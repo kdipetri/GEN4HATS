@@ -89,7 +89,7 @@ print options.product
 #process.load("RecoJets.Configuration.GenJetParticles_cff")
 #process.load("RecoJets.JetProducers.ak5GenJets_cfi")
 process.load("CMSDASGEN.GenExercise.ZjetsAnalysis_cfi")
-process.genWBoson.src = cms.InputTag(options.product)
+process.genZBoson.src = cms.InputTag(options.product)
 process.genLeptons.src = cms.InputTag(options.product)
 
 

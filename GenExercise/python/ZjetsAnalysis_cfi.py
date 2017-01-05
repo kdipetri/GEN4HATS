@@ -2,45 +2,45 @@ import FWCore.ParameterSet.Config as cms
 
 #from RecoJets.JetProducers.ak5GenJets_cfi import *
 
-genWBoson = cms.EDFilter("CandViewShallowCloneProducer",
+genZBoson = cms.EDFilter("CandViewShallowCloneProducer",
 #  src = cms.InputTag(options.product),
   cut = cms.string(" abs(pdgId)==23 && (status==3 || status==62) ")
 )
 
-plotGenWBoson= cms.EDAnalyzer(
+plotGenZBoson= cms.EDAnalyzer(
 	"CandViewHistoAnalyzer",
-	src = cms.InputTag("genWBoson"),							   
+	src = cms.InputTag("genZBoson"),							   
 	histograms = cms.VPSet(
 	    cms.PSet(
 	    min = cms.untracked.double(0.0),
 	    max = cms.untracked.double(300.0),
 	    nbins = cms.untracked.int32(100),
-	    name = cms.untracked.string("W_pT_logscale"),
-	    description = cms.untracked.string("W_pT [GeV/c]"),
+	    name = cms.untracked.string("Z_pT_logscale"),
+	    description = cms.untracked.string("Z_pT [GeV/c]"),
 	    plotquantity = cms.untracked.string("pt")
 	    ),
 	    cms.PSet(
 	    min = cms.untracked.double(0.0),
 	    max = cms.untracked.double(50.0),
 	    nbins = cms.untracked.int32(100),
-	    name = cms.untracked.string("W_pT_low"),
-	    description = cms.untracked.string("W_pT [GeV/c]"),
+	    name = cms.untracked.string("Z_pT_low"),
+	    description = cms.untracked.string("Z_pT [GeV/c]"),
 	    plotquantity = cms.untracked.string("pt")
 	    ),		
 	    cms.PSet(
 	    min = cms.untracked.double(-5.0),
 	    max = cms.untracked.double(5.0),
 	    nbins = cms.untracked.int32(50),
-	    name = cms.untracked.string("W_rapidity"),
-	    description = cms.untracked.string("W_rapidity"),
+	    name = cms.untracked.string("Z_rapidity"),
+	    description = cms.untracked.string("Z_rapidity"),
 	    plotquantity = cms.untracked.string("rapidity")
 	    ),
 	    cms.PSet(
 	    min = cms.untracked.double(-3.2),
 	    max = cms.untracked.double(3.2),
 	    nbins = cms.untracked.int32(32),
-	    name = cms.untracked.string("W_phi"),
-	    description = cms.untracked.string("W_#varphi"),
+	    name = cms.untracked.string("Z_phi"),
+	    description = cms.untracked.string("Z_#varphi"),
 	    plotquantity = cms.untracked.string("phi")
 	    ),		
 		)
@@ -54,7 +54,7 @@ genLeptons = cms.EDFilter("CandViewShallowCloneProducer",
 
 
 
-WCand = cms.EDProducer("CandViewShallowCloneCombiner",
+ZCand = cms.EDProducer("CandViewShallowCloneCombiner",
      decay = cms.string("genLeptons@+ genLeptons@-"),
      checkCharge = cms.bool(False),
 	 cut = cms.string(" pt>-1 ")
@@ -69,29 +69,29 @@ WCand = cms.EDProducer("CandViewShallowCloneCombiner",
 ##   dauSrc = cms.InputTag("WCand")
 ##)
 
-transverseW = cms.EDFilter("CandViewShallowCloneProducer",
-  src = cms.InputTag("WCand"),
+transverseZ = cms.EDFilter("CandViewShallowCloneProducer",
+  src = cms.InputTag("ZCand"),
   cut = cms.string(" pt>-1 ")
 )
 
-plotTransverseW= cms.EDAnalyzer(
+plotTransverseZ= cms.EDAnalyzer(
 	"CandViewHistoAnalyzer",
-	src = cms.InputTag("transverseW"),							   
+	src = cms.InputTag("transverseZ"),							   
 	histograms = cms.VPSet(
 	    cms.PSet(
 	    min = cms.untracked.double(0.0),
 	    max = cms.untracked.double(150.0),
 	    nbins = cms.untracked.int32(50),
-	    name = cms.untracked.string("transW_pT_logscale"),
-	    description = cms.untracked.string("W_pT [GeV/c]"),
+	    name = cms.untracked.string("transZ_pT_logscale"),
+	    description = cms.untracked.string("Z_pT [GeV/c]"),
 	    plotquantity = cms.untracked.string("pt")
 	    ),
 	    cms.PSet(
 	    min = cms.untracked.double(0.0),
 	    max = cms.untracked.double(150.0),
 	    nbins = cms.untracked.int32(50),
-	    name = cms.untracked.string("transW_mass"),
-	    description = cms.untracked.string("W_mT [GeV/c]"),
+	    name = cms.untracked.string("transZ_mass"),
+	    description = cms.untracked.string("Z_mT [GeV/c]"),
 	    plotquantity = cms.untracked.string("sqrt(2*daughter(0).pt*daughter(1).pt*(1.0-cos(daughter(0).phi - daughter(1).phi) ) )")
 	   )
    )
@@ -112,7 +112,7 @@ printGenParticles = cms.EDAnalyzer("ParticleListDrawer",
 
 printHighest = cms.EDAnalyzer("ParticleListDrawer",
 #     src = cms.InputTag("highestPtJet"),
-     src = cms.InputTag("transverseW"),
+     src = cms.InputTag("transverseZ"),
      maxEventsToPrint = cms.untracked.int32(10)
 )
 
@@ -160,16 +160,14 @@ plotGenLeptons= cms.EDAnalyzer("CandViewHistoAnalyzer",
 
 
 analysis = cms.Sequence(
-	genWBoson *
-	plotGenWBoson *
+	genZBoson *
+	plotGenZBoson *
 	genLeptons*
 	plotGenLeptons*
-        WCand*
-        transverseW*
+        ZCand*
+        transverseZ*
 # 	printGenParticles*
 # 	printGenLeptons*
-        plotTransverseW
+        plotTransverseZ
 
 						 )
-
-
