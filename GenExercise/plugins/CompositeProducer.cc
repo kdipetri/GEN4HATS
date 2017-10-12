@@ -24,7 +24,7 @@
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/global/EDProducer.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -49,19 +49,18 @@
 // class declaration
 //
 
-class CompositeProducer : public edm::EDProducer {
-   public:
-      explicit CompositeProducer(const edm::ParameterSet&);
-      ~CompositeProducer();
+class CompositeProducer : public edm::global::EDProducer<> {
+  public:
+    explicit CompositeProducer(const edm::ParameterSet&);
+    ~CompositeProducer();
 
-   private:
-      virtual void beginJob() ;
-      virtual void produce(edm::Event&, const edm::EventSetup&);
-      virtual void endJob() ;
+  private:
+    void produce(edm::StreamID, edm::Event&, const edm::EventSetup&) const override;
       
-      // ----------member data ---------------------------
+    // ----------member data ---------------------------
 
-  edm::InputTag    dauSrc_;
+    edm::InputTag dauSrc_;
+    edm::EDGetTokenT<reco::CandidateCollection> dauTok_;
 };
 
 //
@@ -77,10 +76,10 @@ class CompositeProducer : public edm::EDProducer {
 // constructors and destructor
 //
 CompositeProducer::CompositeProducer(const edm::ParameterSet& iConfig) :
-  dauSrc_ ( iConfig.getParameter<edm::InputTag>("dauSrc") )
+  dauSrc_ ( iConfig.getParameter<edm::InputTag>("dauSrc") ),
+  dauTok_ ( consumes<reco::CandidateCollection>(dauSrc_) )
 {
   produces<std::vector<reco::CompositeCandidate> > ();
-  
 }
 
 
@@ -96,14 +95,13 @@ CompositeProducer::~CompositeProducer()
 
 // ------------ method called to produce the data  ------------
 void
-CompositeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
+CompositeProducer::produce(edm::StreamID, edm::Event& iEvent, const edm::EventSetup& iSetup) const
 {
 
-  std::auto_ptr<std::vector<reco::CompositeCandidate> > jpsiCands( new std::vector<reco::CompositeCandidate> );
+  auto jpsiCands = std::make_unique<std::vector<reco::CompositeCandidate>>();
   edm::Handle<reco::CandidateCollection> h_daus;
 
-
-  iEvent.getByLabel( dauSrc_, h_daus );
+  iEvent.getByToken( dauTok_, h_daus );
 
   reco::Particle::LorentzVector temp(0,0,0,0);
 	
@@ -111,37 +109,17 @@ CompositeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     reco::CompositeCandidate jpsi;
 
-    double hTrans=0.0;
-    
-    for ( reco::CandidateCollection::const_iterator muonsBegin = h_daus->begin(),
-	    muonsEnd = h_daus->end(), imuon = muonsBegin;
-	  imuon != muonsEnd; ++imuon ) {
-
-
-	    jpsi.addDaughter( *imuon );
-            hTrans += imuon->pt();
-            temp += reco::Particle::LorentzVector(imuon->px(),imuon->py(),0.0,imuon->pt());
+    for ( const auto& imuon : *(h_daus.product()) ) {
+	  jpsi.addDaughter( imuon );
+      temp += reco::Particle::LorentzVector(imuon.px(),imuon.py(),0.0,imuon.pt());
     }
 
-//    AddFourMomenta addp4;
-//    addp4.set( jpsi );
     jpsi.setP4( temp );
     jpsiCands->push_back( jpsi );
 
-//    jpsi.addUserFloat("hTrans", hTrans );
   }
-  iEvent.put( jpsiCands );
-}
 
-// ------------ method called once each job just before starting event loop  ------------
-void 
-CompositeProducer::beginJob()
-{
-}
-
-// ------------ method called once each job just after ending the event loop  ------------
-void 
-CompositeProducer::endJob() {
+  iEvent.put( std::move(jpsiCands) );
 }
 
 //define this as a plug-in
